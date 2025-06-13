@@ -49,3 +49,15 @@ export interface PaginatedResponse<T> {
   page: number;
   limit: number;
 }
+
+export interface GlobalState {
+  isLoggedIn: boolean;
+  userData: User | null;
+  apiBaseUrl: string;
+}
+
+declare global {
+  interface Window {
+    globalState: GlobalState;
+  }
+}

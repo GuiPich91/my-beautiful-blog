@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { LoginResponse, GlobalState } from '@/types';
 import { useAuth } from '@/hooks/useAuth';
 import Layout from '@/components/Layout';
 
@@ -43,14 +44,14 @@ export default function LoginPage() {
         throw new Error('Identifiants incorrects');
       }
       
-      const data = await response.json();
+      const data = await response.json() as LoginResponse;
 
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
       
       if (typeof window !== 'undefined') {
         window.globalState.isLoggedIn = true;
-        window.globalState.userData = data.user;
+        (window.globalState as GlobalState).userData = data.user;
       }
 
       router.push('/admin');

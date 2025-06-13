@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { PaginationParams } from '@/types';
 
 interface UsePaginationProps {
   initialPage?: number;
@@ -13,15 +14,18 @@ export function usePagination({ initialPage = 1, itemsPerPage = 10 }: UsePaginat
     setCurrentPage(page);
   };
 
-  const updateTotalPages = (totalItems: number) => {
-    setTotalPages(Math.ceil(totalItems / itemsPerPage));
+  const updateTotalPages = (total: number) => {
+    setTotalPages(Math.ceil(total / itemsPerPage));
   };
 
   return {
     currentPage,
     totalPages,
-    itemsPerPage,
     handlePageChange,
-    updateTotalPages
+    updateTotalPages,
+    paginationParams: {
+      page: currentPage,
+      limit: itemsPerPage
+    } as PaginationParams
   };
 } 

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Post } from '@/types';
+import { Post, PaginatedResponse } from '@/types';
 import { usePagination } from '@/hooks/usePagination';
 import Layout from '@/components/Layout';
 import Pagination from '@/components/Pagination';
@@ -11,7 +11,7 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   
-  const { currentPage, totalPages, handlePageChange, updateTotalPages } = usePagination();
+  const { currentPage, totalPages, handlePageChange, updateTotalPages, paginationParams } = usePagination();
   
   useEffect(() => {
     fetchPosts();
@@ -29,7 +29,7 @@ export default function Home() {
         throw new Error('Erreur lors de la récupération des articles');
       }
       
-      const data = await response.json();
+      const data = await response.json() as PaginatedResponse<Post>;
       
       const transformedPosts = data.data.map((post: Post) => ({
         ...post,
@@ -80,7 +80,8 @@ export default function Home() {
         ))}
         
         <Pagination
-          currentPage={currentPage}
+          page={currentPage}
+          limit={paginationParams.limit}
           totalPages={totalPages}
           onPageChange={handlePageChange}
         />

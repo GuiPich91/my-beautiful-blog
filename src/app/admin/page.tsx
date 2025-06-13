@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Tag } from '@/types';
+import { Tag, Post } from '@/types';
 import { useAuth } from '@/hooks/useAuth';
 import Layout from '@/components/Layout';
 
@@ -37,7 +37,7 @@ export default function AdminPage() {
         throw new Error('Erreur lors de la récupération des tags');
       }
       
-      const data = await response.json();
+      const data = await response.json() as Tag[];
       setTags(data);
     } catch (err) {
       console.error('Erreur:', err);
@@ -86,7 +86,7 @@ export default function AdminPage() {
           content: newPostContent,
           author: userData.username,
           tags: newPostTags,
-        }),
+        } as Post),
       });
       
       if (!response.ok) {
