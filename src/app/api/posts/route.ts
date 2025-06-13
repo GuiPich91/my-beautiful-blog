@@ -16,8 +16,8 @@ export async function GET(request: Request) {
     // Récupérer les tags pour chaque post
     for (const post of result.rows) {
       if (post.tags && post.tags.length > 0) {
-        const tagsQuery = `SELECT id, title FROM tags WHERE id = ANY(ARRAY[${post.tags.join(',')}])`;
-        const tagsResult = await executeQuery(tagsQuery);
+        const tagsQuery = `SELECT id, title FROM tags WHERE id = ANY($1)`;
+        const tagsResult = await executeQuery(tagsQuery, [post.tags]);
         post.tagObjects = tagsResult.rows;
       } else {
         post.tagObjects = [];
@@ -59,7 +59,7 @@ export async function POST(request: Request) {
 
     const query = `
       INSERT INTO posts (title, content, author, date, tags)
-      VALUES ($1, $2, $3, NOW(), '{' || $4 || '}')
+      VALUES ($1, $2, $3, NOW(), $4::integer[])
       RETURNING *
     `;
     
