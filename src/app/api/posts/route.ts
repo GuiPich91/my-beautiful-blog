@@ -59,7 +59,7 @@ export async function POST(request: Request) {
 
     const query = `
       INSERT INTO posts (title, content, author, date, tags)
-      VALUES ($1, $2, $3, NOW(), '{' || $4 || '}')
+      VALUES ($1, $2, $3, NOW(), $4::integer[])
       RETURNING *
     `;
     
