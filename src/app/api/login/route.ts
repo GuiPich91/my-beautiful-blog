@@ -9,8 +9,8 @@ export async function POST(request: Request) {
   try {
     const credentials = await request.json();
 
-    const query = `SELECT * FROM users WHERE user_name = '${credentials.username}' AND pass = '${credentials.password}'`;
-    const result = await executeQuery(query);
+    const query = `SELECT * FROM users WHERE username = $1 AND password = $2`;
+    const result = await executeQuery(query, [credentials.username, credentials.password]);
     
     if (result.rows.length > 0) {
       const user = result.rows[0];
