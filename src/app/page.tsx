@@ -2,10 +2,12 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Post } from '@/types';
 import { initGlobalState, applyDarkMode } from '@/lib/globals';
 
 export default function Home() {
+  const router = useRouter();
   const [posts, setPosts] = useState<Post[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -110,7 +112,7 @@ export default function Home() {
       window.globalState.userData = null;
     }
     
-    window.location.href = '/';
+    router.push('/');
   };
   
   return (

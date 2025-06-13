@@ -122,7 +122,7 @@ export default function AdminPage() {
       
       alert('Article créé avec succès !');
 
-      window.location.href = '/';
+      router.push('/');
     } catch (err) {
       console.error('Erreur:', err);
       setError('Erreur lors de la création de l\'article');
