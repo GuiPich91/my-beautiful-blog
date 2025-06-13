@@ -4,52 +4,30 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Tag } from '@/types';
+import { useAuth } from '@/hooks/useAuth';
+import Layout from '@/components/Layout';
 
 export default function AdminPage() {
   const [newPostTitle, setNewPostTitle] = useState('');
   const [newPostContent, setNewPostContent] = useState('');
   const [newPostTags, setNewPostTags] = useState<number[]>([]);
   const [tags, setTags] = useState<Tag[]>([]);
-  
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [userData, setUserData] = useState<Record<string, unknown> | null>(null);
-  
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   
   const router = useRouter();
+  const { isLoggedIn, userData, isLoading: authLoading } = useAuth();
   
   useEffect(() => {
-    // Vérification du token stocké en local
-    const token = localStorage.getItem('token');
-    if (!token) {
-      // Redirection vers la page de connexion si non connecté
+    if (!authLoading && !isLoggedIn) {
       router.push('/login');
       return;
     }
-    
-    // Récupération des données utilisateur
-    const userDataStr = localStorage.getItem('user');
-    if (userDataStr) {
-      try {
-        const userDataObj = JSON.parse(userDataStr);
-        setUserData(userDataObj);
-        setIsLoggedIn(true);
-        
-        if (typeof window !== 'undefined') {
-          window.globalState.isLoggedIn = true;
-          window.globalState.userData = userDataObj;
-        }
-      } catch (err) {
-        console.error('Erreur lors de la lecture des données utilisateur:', err);
-      }
+    if (!authLoading && isLoggedIn) {
+      fetchTags();
     }
-    
-    // Charger les tags au chargement du composant
-    fetchTags();
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [isLoggedIn, authLoading, router]);
   
-  // Fonction pour récupérer les tags
   const fetchTags = async () => {
     try {
       const apiBaseUrl = typeof window !== 'undefined' ? window.globalState.apiBaseUrl : '/api';
@@ -66,7 +44,6 @@ export default function AdminPage() {
     }
   };
   
-  // Fonction pour gérer la sélection des tags
   const handleTagSelection = (tagId: number) => {
     setNewPostTags((prevTags) => {
       if (prevTags.includes(tagId)) {
@@ -121,8 +98,7 @@ export default function AdminPage() {
       setNewPostTags([]);
       
       alert('Article créé avec succès !');
-
-      window.location.href = '/';
+      router.push('/');
     } catch (err) {
       console.error('Erreur:', err);
       setError('Erreur lors de la création de l\'article');
@@ -131,8 +107,12 @@ export default function AdminPage() {
     }
   };
 
+  if (authLoading) {
+    return <Layout><div>Chargement...</div></Layout>;
+  }
+
   return (
-    <div className="container">
+    <Layout>
       <div className="admin-container">
         <h2>Administration</h2>
         
@@ -203,6 +183,6 @@ export default function AdminPage() {
           <Link href="/">Retour à l&apos;accueil</Link>
         </div>
       </div>
-    </div>
+    </Layout>
   );
 }

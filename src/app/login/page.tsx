@@ -3,30 +3,23 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { useAuth } from '@/hooks/useAuth';
+import Layout from '@/components/Layout';
 
 // Page de connexion
 export default function LoginPage() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [loginError, setLoginError] = useState<string | null>(null);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   
   const router = useRouter();
+  const { isLoggedIn, isLoading } = useAuth();
   
-  // Vérification du token au chargement
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      setIsLoggedIn(true);
-      
-      if (typeof window !== 'undefined') {
-        window.globalState.isLoggedIn = true;
-      }
-      
-      // Rediriger vers l'admin si déjà connecté
+    if (!isLoading && isLoggedIn) {
       router.push('/admin');
     }
-  }, [router]);
+  }, [isLoggedIn, isLoading, router]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -55,8 +48,6 @@ export default function LoginPage() {
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
       
-      setIsLoggedIn(true);
-      
       if (typeof window !== 'undefined') {
         window.globalState.isLoggedIn = true;
         window.globalState.userData = data.user;
@@ -69,12 +60,16 @@ export default function LoginPage() {
     }
   };
 
+  if (isLoading) {
+    return <Layout><div>Chargement...</div></Layout>;
+  }
+
   if (isLoggedIn) {
     return null;
   }
   
   return (
-    <div className="container">
+    <Layout>
       <div className="login-container">
         <h2>Connexion</h2>
         
@@ -108,6 +103,6 @@ export default function LoginPage() {
           <Link href="/">Retour à l&apos;accueil</Link>
         </div>
       </div>
-    </div>
+    </Layout>
   );
 }
